@@ -1,0 +1,21 @@
+app:
+  name: "minicloud_v1"
+  port: 9000
+  mode: "dev"
+
+mysql:
+  host: "127.0.0.1"
+  port: 3306
+  user: "root"
+  password: "153420cp"
+  DBName: "minicloud"
+
+jwt:
+  secretkey: "cpipi1024"
+  ttl: 3600
+
+log:
+  level: "dev"
+  path: "/home/yangtao/workspace/minicloud/logs"
+
+cloudpath: "/home/yangtao/minicloud"
