@@ -8,11 +8,6 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 )
 
-var (
-	jwtkey = bootstrap.SrvConf.JWT.SecretKey //签名私钥
-	ttl    = bootstrap.SrvConf.JWT.TTL       // ttl
-)
-
 // token数据
 type TokenData struct {
 	TokenType string `json:"token_type"` // token类型
@@ -41,11 +36,14 @@ var JwtService = new(jwtService)
 
 // todo: 创建token
 func (service *jwtService) CreateToken(user JwtUser) (*jwt.Token, TokenData, error) {
+	jwtkey := bootstrap.SrvConf.JWT.SecretKey
+	ttl := bootstrap.SrvConf.JWT.TTL
+
 	custClaim := CustomClaim{
-		user.GetName(),
-		user.GetUUID(),
-		user.GetRole(),
-		jwt.RegisteredClaims{
+		UserName: user.GetName(),
+		UUID:     user.GetUUID(),
+		Role:     user.GetRole(),
+		RegisteredClaims: jwt.RegisteredClaims{
 			ID:        user.GetUUID(),                                                       // jwtid
 			Issuer:    "minicloud",                                                          // 签发人
 			NotBefore: jwt.NewNumericDate(time.Now().Add(-5 * time.Second)),                 // 生效前
@@ -57,7 +55,7 @@ func (service *jwtService) CreateToken(user JwtUser) (*jwt.Token, TokenData, err
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, custClaim)
 
 	// 使用私钥进行签名
-	str, err := token.SignedString(jwtkey)
+	str, err := token.SignedString([]byte(jwtkey))
 
 	if err != nil {
 		return nil, TokenData{}, err
