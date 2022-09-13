@@ -22,7 +22,7 @@ func (service *userService) RegisterUser(form forms.UserRegisterForm) error {
 	data := map[string]interface{}{
 		"name":     form.Name,
 		"email":    form.Email,
-		"mobile":   form.Email,
+		"mobile":   form.Mobile,
 		"password": form.Password,
 		"role":     db.RoleUser,
 	}
