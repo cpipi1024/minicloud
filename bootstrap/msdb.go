@@ -40,8 +40,8 @@ func RegisterInjector(f injecotor) {
 
 // todo: 拼接dsn
 func genDsn(host string, port int, username string, password string, database string) string {
-	fmtstr := "%s:%v@tcp(%v:%v)/%s?charset=utf8mb4&parseTime=True&loc=Local"
+	fmtstr := "%s:%s@tcp(%s:%v)/%s?charset=utf8mb4&parseTime=True&loc=Local"
 
-	return fmt.Sprintf(fmtstr, host, port, username, password, database)
+	return fmt.Sprintf(fmtstr, username, password, host, port, database)
 
 }
