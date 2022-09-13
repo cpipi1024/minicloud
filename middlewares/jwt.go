@@ -1,6 +1,8 @@
 package middlewares
 
 import (
+	"strings"
+
 	"cpipi1024.com/minicloud/api"
 	"cpipi1024.com/minicloud/bootstrap"
 	"cpipi1024.com/minicloud/service"
@@ -9,7 +11,7 @@ import (
 )
 
 var (
-	secretKey = bootstrap.SrvConf.JWT.SecretKey
+	secretKey = "cpipi1024"
 )
 
 func JWTMiddlewares(issuer string) gin.HandlerFunc {
@@ -22,7 +24,7 @@ func JWTMiddlewares(issuer string) gin.HandlerFunc {
 			return
 		}
 
-		tokenType := data[:6] // token类型
+		tokenType := strings.ToLower(data[:6]) // token类型
 
 		if tokenType != "bearer" {
 			api.Fail(c, bootstrap.CodeJWTAuthInvalid, "token类型错误")
