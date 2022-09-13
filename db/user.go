@@ -14,7 +14,7 @@ type User struct {
 	Email    string   `gorm:"column:email;type:varchar(100)" json:"email"`
 	Mobile   string   `gorm:"column:mobile;type:varchar(100)" json:"mobile"`
 	Password string   `gorm:"column:password;type:varchar(100)" json:"password,omitempty"`
-	Role     RoleType `gorm:"column:role;type:unsigned integer" json:"role"`
+	Role     RoleType `gorm:"column:role;type:integer unsigned" json:"role"`
 	BaseDir  string   `gorm:"column:base_dir;type:varchar(100)" json:"base_dir"`
 }
 
