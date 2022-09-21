@@ -1,4 +1,4 @@
-package bootstrap
+package customerr
 
 import (
 	"errors"
@@ -15,6 +15,11 @@ const (
 	CodeRegisterFailed = 20001 // 用户注册失败
 	CodeLoginFailed    = 20002 // 用户登录失败
 
+	// resourceservice
+	CodeResourceUploadFailed    = 20010 // 资源上传失败
+	CodeResourceDownloadFailed  = 20020 // 资源下载失败
+	CodeCreateResourceDirFailed = 20030 // 创建资源文件夹失败
+
 	// mysql
 	CodeMySQLOptFailed = 30001 // 数据库操作错误
 
@@ -30,6 +35,9 @@ var (
 	// userservice
 	ErrRegisterFailed = errors.New("用户注册失败")
 	ErrLoginFailed    = errors.New("用户登录失败")
+
+	// resource service
+	ErrCreateResourceDirFailed = errors.New("创建用户根目录失败")
 
 	// mysql
 	ErrMySQLOptFailed = errors.New("Mysql数据库操作失败")
