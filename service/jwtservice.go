@@ -20,6 +20,7 @@ type CustomClaim struct {
 	UserName string      `json:"user_name"` // 用户名
 	UUID     string      `json:"uuid"`      // 用户uuid
 	Role     db.RoleType `json:"role"`      // 用户角色
+	BaseDir  string      `json:"base_dir"`  // 用户初始路径
 	jwt.RegisteredClaims
 }
 
@@ -28,6 +29,7 @@ type JwtUser interface {
 	GetUUID() string
 	GetRole() db.RoleType
 	GetName() string
+	GetBaseDir() string
 }
 
 type jwtService struct{}
@@ -43,6 +45,7 @@ func (service *jwtService) CreateToken(user JwtUser) (*jwt.Token, TokenData, err
 		UserName: user.GetName(),
 		UUID:     user.GetUUID(),
 		Role:     user.GetRole(),
+		BaseDir:  user.GetBaseDir(),
 		RegisteredClaims: jwt.RegisteredClaims{
 			ID:        user.GetUUID(),                                                       // jwtid
 			Issuer:    "minicloud",                                                          // 签发人
