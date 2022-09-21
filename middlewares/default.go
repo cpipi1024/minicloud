@@ -53,16 +53,14 @@ func GinRecover(logger *zap.Logger, stack bool) gin.HandlerFunc {
 					}
 				}
 
-				// 转储结构体
+				// 转存请求体
 				httpRequest, _ := httputil.DumpRequest(c.Request, true)
-
 				if brokenPipe {
 					logger.Error(
 						c.Request.URL.Path,
 						zap.Any("error", err),
 						zap.String("request", string(httpRequest)),
 					)
-
 					c.Error(err.(error))
 					c.Abort()
 					return
