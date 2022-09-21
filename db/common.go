@@ -17,7 +17,6 @@ const (
 var (
 	tables []interface{} = []interface{}{
 		&User{},
-		&Resource{},
 	}
 )
 
