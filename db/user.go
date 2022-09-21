@@ -2,7 +2,6 @@ package db
 
 import (
 	"cpipi1024.com/minicloud/bootstrap"
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -19,11 +18,11 @@ type User struct {
 }
 
 // todo: user生成uuid的回调
-func (u *User) BeforeCreate(db *gorm.DB) error {
+/* func (u *User) BeforeCreate(db *gorm.DB) error {
 
 	u.UUID = uuid.NewString()
 	return nil
-}
+} */
 
 // todo: 返回uuid
 //
@@ -42,13 +41,20 @@ func (u User) GetName() string {
 	return u.Name
 }
 
+// todo: 返回用户默认目录
+func (u User) GetBaseDir() string {
+	return u.BaseDir
+}
+
 // todo: 创建用户
 func CreateUser(data map[string]interface{}) error {
 	u := User{
+		UUID:     data["uuid"].(string),
 		Name:     data["name"].(string),
 		Email:    data["email"].(string),
 		Mobile:   data["mobile"].(string),
 		Password: data["password"].(string),
+		BaseDir:  data["base_dir"].(string),
 		Role:     RoleUser,
 	}
 
@@ -102,7 +108,7 @@ func QueryUserByMobile(mobile string) (*User, error) {
 }
 
 // todo: 分页查询用户
-func QueryUsers(query interface{}, pageNum, pageSize int) ([]*User, error) {
+func QueryUsers(query map[string]interface{}, pageNum, pageSize int) ([]*User, error) {
 
 	users := []*User{}
 
@@ -116,7 +122,7 @@ func QueryUsers(query interface{}, pageNum, pageSize int) ([]*User, error) {
 }
 
 // todo: 根据ID修改用户
-func UpdateUserByID(id int, data interface{}) error {
+func UpdateUserByID(id int, data map[string]interface{}) error {
 	res := bootstrap.MSDB.Model(User{}).Where("id = ?", id).Updates(data)
 
 	if res.Error != nil {
@@ -127,7 +133,7 @@ func UpdateUserByID(id int, data interface{}) error {
 }
 
 // todo: 根据UUID修改用户
-func UpdateUserByUUID(uuid string, data interface{}) error {
+func UpdateUserByUUID(uuid string, data map[string]interface{}) error {
 	res := bootstrap.MSDB.Model(User{}).Where("uuid = ?", uuid).Updates(data)
 
 	if res.Error != nil {
