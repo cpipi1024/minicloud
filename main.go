@@ -29,6 +29,8 @@ func main() {
 
 	routers.UserRouter(r)
 
+	routers.ResourceRouter(r)
+
 	e.Run(":9000")
 
 }
