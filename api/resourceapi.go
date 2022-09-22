@@ -18,18 +18,50 @@ const (
 	defaultMemory = 32 << 20
 )
 
+// todo: 分发文件操作
+//
+// 0: 查询文件信息
+// 1: 删除文件
+// 2: 创建文件夹
+// 3: 删除文件夹
+func ResourceManage(c *gin.Context) {
+	optStr := c.DefaultQuery("operate", "0")
+	name := c.PostForm("name")
+	switch optStr {
+	case "0":
+		c.Set("resource_name", name)
+		GetResourceDetail(c)
+	case "1":
+		c.Set("filename", name)
+		DeleteResourceFile(c)
+	case "2":
+		c.Set("dirname", name)
+		CreateResourceDir(c)
+	case "3":
+		c.Set("dirname", name)
+		DeleteResourceDir(c)
+	default:
+		Fail(c, 0, "业务失败")
+		c.Abort()
+		return
+	}
+
+}
+
 // todo: 获取文件细节
 func GetResourceDetail(c *gin.Context) {
 
-	rawDir, _ := c.Get("baseDir")
+	rawDir, _ := c.Get("base_dir")
 
 	baseDir := rawDir.(string)
 
 	relative := c.DefaultQuery("path", "")
 
-	filename := c.DefaultQuery("name", "")
+	value, _ := c.Get("resource_name")
 
-	data, err := service.ResourceService.ResourceDetail(baseDir, relative, filename)
+	resourceName := value.(string)
+
+	data, err := service.ResourceService.ResourceDetail(baseDir, relative, resourceName)
 
 	if err != nil {
 		Fail(c, 0, "获取文件详情失败")
@@ -41,16 +73,17 @@ func GetResourceDetail(c *gin.Context) {
 
 // todo: 删除文件
 func DeleteResourceFile(c *gin.Context) {
-	rawDir, _ := c.Get("baseDir")
+	rawDir, _ := c.Get("base_dir")
 
 	baseDir := rawDir.(string)
 
 	relative := c.DefaultQuery("path", "")
 
-	filename := c.DefaultQuery("name", "")
+	// 获取需要删除的文件夹名
+	value, _ := c.Get("filename")
+	filename := value.(string)
 
 	// 缺少filename的检查
-
 	err := service.ResourceService.DeleteResourceFile(baseDir, relative, filename)
 
 	if err != nil {
@@ -65,7 +98,7 @@ func DeleteResourceFile(c *gin.Context) {
 
 // todo: 获取指定路径文件夹下的文件
 func ListFiles(c *gin.Context) {
-	rawDir, _ := c.Get("baseDir")
+	rawDir, _ := c.Get("base_dir")
 
 	baseDir := rawDir.(string)
 
@@ -84,13 +117,15 @@ func ListFiles(c *gin.Context) {
 
 // todo: 创建文件夹
 func CreateResourceDir(c *gin.Context) {
-	rawDir, _ := c.Get("baseDir")
+	rawDir, _ := c.Get("base_dir")
 
 	baseDir := rawDir.(string)
 
 	relative := c.DefaultQuery("path", "")
 
-	dirname := c.DefaultQuery("name", "")
+	// 获取传入的文件夹名
+	value, _ := c.Get("dirname")
+	dirname := value.(string)
 
 	err := service.ResourceService.CreateResourceDir(baseDir, relative, dirname)
 
@@ -105,13 +140,14 @@ func CreateResourceDir(c *gin.Context) {
 
 // todo: 删除文件夹
 func DeleteResourceDir(c *gin.Context) {
-	rawDir, _ := c.Get("baseDir")
+	rawDir, _ := c.Get("base_dir")
 
 	baseDir := rawDir.(string)
 
 	relative := c.DefaultQuery("path", "")
 
-	dirname := c.DefaultQuery("name", "")
+	value, _ := c.Get("dirname")
+	dirname := value.(string)
 
 	err := service.ResourceService.DeleteResourceDir(baseDir, relative, dirname)
 
@@ -127,7 +163,7 @@ func DeleteResourceDir(c *gin.Context) {
 // todo: 上传文件
 func UploadFile(c *gin.Context) {
 
-	rawDir, _ := c.Get("baseDir") // 获取用户目录
+	rawDir, _ := c.Get("base_dir") // 获取用户目录
 
 	baseDir := rawDir.(string)
 
@@ -159,7 +195,7 @@ func UploadFile(c *gin.Context) {
 
 // todo: 下载文件
 func DownloaFile(c *gin.Context) {
-	rawDir, _ := c.Get("baseDir")
+	rawDir, _ := c.Get("base_dir")
 
 	baseDir := rawDir.(string)
 

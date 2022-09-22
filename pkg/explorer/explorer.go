@@ -41,6 +41,12 @@ func NewDefaultExplorer(root string) *Explorer {
 
 // todo: 进入下一级目录
 func (exp *Explorer) EnterDir(dirname string) error {
+
+	// 空文件目录则不做任何操作
+	if dirname == "" {
+		return nil
+	}
+
 	newpath := filepath.Join(exp.currentDir, dirname)
 
 	if !dirExist(newpath) {

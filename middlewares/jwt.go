@@ -47,8 +47,8 @@ func JWTMiddlewares(issuer string) gin.HandlerFunc {
 		// 获得token负载内容
 		claims := token.Claims.(*service.CustomClaim)
 		c.Set("uuid", claims.UUID)
-		c.Set("userName", claims.UserName)
+		c.Set("user_name", claims.UserName)
 		c.Set("role", claims.Role)
-		c.Set("baseDir", claims.BaseDir) // 用户默认路径
+		c.Set("base_dir", claims.BaseDir) // 用户默认路径
 	}
 }
