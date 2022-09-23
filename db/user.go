@@ -91,6 +91,10 @@ func QueryUserByUUID(uuid string) (*User, error) {
 		return nil, res.Error
 	}
 
+	if res.RowsAffected == 0 {
+		return nil, gorm.ErrRecordNotFound
+	}
+
 	return &user, nil
 }
 
