@@ -64,7 +64,8 @@ func GetResourceDetail(c *gin.Context) {
 	data, err := service.ResourceService.ResourceDetail(baseDir, relative, resourceName)
 
 	if err != nil {
-		Fail(c, 0, "获取文件详情失败")
+		c.Set("zapinfo", "[resource service failed]")
+		c.Error(err)
 		c.Abort()
 		return
 	}
@@ -87,13 +88,12 @@ func DeleteResourceFile(c *gin.Context) {
 	err := service.ResourceService.DeleteResourceFile(baseDir, relative, filename)
 
 	if err != nil {
-		Fail(c, 0, "删除文件失败")
+		c.Error(err)
 		c.Abort()
 		return
 	}
 
-	Succes(c, "success")
-
+	Succes(c, nil)
 }
 
 // todo: 获取指定路径文件夹下的文件
@@ -107,7 +107,7 @@ func ListFiles(c *gin.Context) {
 	data, err := service.ResourceService.ListContents(baseDir, relativePath)
 
 	if err != nil {
-		Fail(c, 0, "获取文件夹信息失败")
+		c.Error(err)
 		c.Abort()
 		return
 	}
@@ -130,12 +130,12 @@ func CreateResourceDir(c *gin.Context) {
 	err := service.ResourceService.CreateResourceDir(baseDir, relative, dirname)
 
 	if err != nil {
-		Fail(c, 0, "创建文件夹失败")
+		c.Error(err)
 		c.Abort()
 		return
 	}
 
-	Succes(c, "success")
+	Succes(c, nil)
 }
 
 // todo: 删除文件夹
@@ -152,12 +152,12 @@ func DeleteResourceDir(c *gin.Context) {
 	err := service.ResourceService.DeleteResourceDir(baseDir, relative, dirname)
 
 	if err != nil {
-		Fail(c, 0, "删除文件夹失败")
+		c.Error(err)
 		c.Abort()
 		return
 	}
 
-	Succes(c, "success")
+	Succes(c, nil)
 }
 
 // todo: 上传文件
@@ -172,7 +172,12 @@ func UploadFile(c *gin.Context) {
 	err := c.Request.ParseMultipartForm(defaultMemory) // 配置最大文件大小
 
 	if err != nil {
-		Fail(c, customerr.CodeResourceUploadFailed, "文件上传失败")
+		custErr := &customerr.CustomError{
+			Inner: err,
+			Code:  customerr.CodeResourceUploadFailed,
+			Msg:   "上传文件失败",
+		}
+		c.Error(custErr)
 		c.Abort()
 		return
 	}
@@ -190,7 +195,7 @@ func UploadFile(c *gin.Context) {
 		}
 	}
 
-	Succes(c, "success")
+	Succes(c, nil)
 }
 
 // todo: 下载文件

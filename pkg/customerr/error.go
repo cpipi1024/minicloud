@@ -16,9 +16,9 @@ const (
 	CodeLoginFailed    = 20002 // 用户登录失败
 
 	// resourceservice
-	CodeResourceUploadFailed    = 20010 // 资源上传失败
-	CodeResourceDownloadFailed  = 20020 // 资源下载失败
-	CodeCreateResourceDirFailed = 20030 // 创建资源文件夹失败
+	CodeResourceUploadFailed   = 20010 // 资源上传失败
+	CodeResourceDownloadFailed = 20020 // 资源下载失败
+	CodeResourceOperateFailed  = 20030 // 资源相关操作失败
 
 	// mysql
 	CodeMySQLOptFailed = 30001 // 数据库操作错误
@@ -37,7 +37,9 @@ var (
 	ErrLoginFailed    = errors.New("用户登录失败")
 
 	// resource service
-	ErrCreateResourceDirFailed = errors.New("创建用户根目录失败")
+	ErrResourceUploadFailed  = errors.New("资源上传失败")
+	ErrResourceDownloaFailed = errors.New("资源下载失败")
+	ErrResourceOperateFailed = errors.New("资源操作失败")
 
 	// mysql
 	ErrMySQLOptFailed = errors.New("Mysql数据库操作失败")
@@ -86,6 +88,12 @@ func (err *CustomError) Is(other error) bool {
 		return err.Code == CodeMySQLOptFailed
 	case ErrJWTAuthFailed:
 		return err.Code == CodeJWTAuthFailed
+	case ErrResourceUploadFailed:
+		return err.Code == CodeResourceUploadFailed
+	case ErrResourceDownloaFailed:
+		return err.Code == CodeResourceDownloadFailed
+	case ErrResourceOperateFailed:
+		return err.Code == CodeResourceOperateFailed
 	}
 
 	return false
