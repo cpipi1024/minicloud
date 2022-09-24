@@ -20,6 +20,9 @@ func UserRouter(router *gin.RouterGroup) {
 	{
 		// 通过UUID得到user
 		auth.GET("/auth/:uuid", api.GetUserByUUID)
+
+		// 表单查询用户
+		auth.POST("/auth/infos", api.QueryUsers)
 	}
 
 }

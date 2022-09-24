@@ -13,17 +13,13 @@ func ResourceRouter(r *gin.RouterGroup) {
 
 	auth := resource.Group("").Use(middlewares.JWTMiddlewares("mincloud"))
 	{
-		// 获取文件信息
-		auth.GET("/file", api.GetResourceDetail)
-		// 获取文件列表
+		// 获取目录信息
 		auth.GET("/files", api.ListFiles)
 		// 上传文件
 		auth.POST("/upload", api.UploadFile)
 		// 下载文件
 		auth.GET("/download", api.DownloaFile)
-		// 删除文件
-		auth.GET("/deleteFile", api.DeleteResourceFile)
-		// 删除文件夹
-		auth.GET("/deleteDir", api.DeleteResourceDir)
+		// 文件操作
+		auth.POST("/manage", api.ResourceManage)
 	}
 }

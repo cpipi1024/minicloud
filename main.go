@@ -25,7 +25,7 @@ func main() {
 
 	r := e.Group("/v1")
 
-	r.Use(middlewares.GinRecover(bootstrap.Logger, true), middlewares.GinLogger(bootstrap.Logger))
+	r.Use(middlewares.GinRecover(bootstrap.Logger, true), middlewares.GinLogger(bootstrap.Logger), middlewares.ErrHandle(bootstrap.Logger))
 
 	routers.UserRouter(r)
 

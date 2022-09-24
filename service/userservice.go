@@ -114,8 +114,8 @@ func (service *userService) QueyUsers(form forms.QueryUserForm) ([]*db.User, err
 		query["email"] = form.Email
 	}
 
-	if form.PageNum == 0 {
-		form.PageNum = 1
+	if form.PageNum < 0 {
+		form.PageNum = 0
 	}
 
 	if form.PageSize == 0 {

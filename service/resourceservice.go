@@ -5,6 +5,7 @@ import (
 	"mime/multipart"
 	"path/filepath"
 
+	"cpipi1024.com/minicloud/pkg/customerr"
 	"cpipi1024.com/minicloud/pkg/explorer"
 )
 
@@ -19,13 +20,21 @@ func (service *resourceService) CreateResourceDir(path, relative, dirname string
 	err := exp.EnterDir(relative)
 
 	if err != nil {
-		return err
+		return &customerr.CustomError{
+			Inner: err,
+			Code:  customerr.CodeResourceOperateFailed,
+			Msg:   "创建文件夹失败",
+		}
 	}
 
 	err = exp.CreateDir(dirname)
 
 	if err != nil {
-		return err
+		return &customerr.CustomError{
+			Inner: err,
+			Code:  customerr.CodeResourceOperateFailed,
+			Msg:   "创建文件夹失败",
+		}
 	}
 
 	return nil
@@ -38,10 +47,24 @@ func (service *resourceService) DeleteResourceDir(path, relative, dirname string
 	err := exp.EnterDir(relative)
 
 	if err != nil {
-		return err
+		return &customerr.CustomError{
+			Inner: err,
+			Code:  customerr.CodeResourceOperateFailed,
+			Msg:   "删除文件夹失败",
+		}
 	}
 
-	return exp.DeleteDir(dirname)
+	err = exp.DeleteDir(dirname)
+
+	if err != nil {
+		return &customerr.CustomError{
+			Inner: err,
+			Code:  customerr.CodeResourceOperateFailed,
+			Msg:   "删除文件夹失败",
+		}
+	}
+
+	return nil
 
 }
 
@@ -52,10 +75,24 @@ func (service *resourceService) DeleteResourceFile(path, relative, filename stri
 	err := exp.EnterDir(relative)
 
 	if err != nil {
-		return err
+		return &customerr.CustomError{
+			Inner: err,
+			Code:  customerr.CodeResourceOperateFailed,
+			Msg:   "删除文件失败",
+		}
 	}
 
-	return exp.DeleteFile(filename)
+	err = exp.DeleteFile(filename)
+
+	if err != nil {
+		return &customerr.CustomError{
+			Inner: err,
+			Code:  customerr.CodeResourceOperateFailed,
+			Msg:   "删除文件失败",
+		}
+	}
+
+	return nil
 }
 
 // todo: 列出当前目录下的内容
@@ -66,22 +103,52 @@ func (service *resourceService) ListContents(path, relative string) ([]*explorer
 	err := exp.EnterDir(relative)
 
 	if err != nil {
-		return nil, err
+		return nil, &customerr.CustomError{
+			Inner: err,
+			Code:  customerr.CodeResourceOperateFailed,
+			Msg:   "查询目录内容失败",
+		}
 	}
 
-	return exp.ListContents()
+	files, err := exp.ListContents()
+
+	if err != nil {
+		return nil, &customerr.CustomError{
+			Inner: err,
+			Code:  customerr.CodeResourceOperateFailed,
+			Msg:   "查询目录内容失败",
+		}
+	}
+
+	return files, nil
 }
 
 // todo: 获取文件info
 func (service *resourceService) ResourceDetail(path, relative, fileaname string) (*explorer.File, error) {
 	exp := explorer.NewDefaultExplorer(path)
 
-	exp.EnterDir(relative)
+	err := exp.EnterDir(relative)
+
+	if err != nil {
+		return nil, &customerr.CustomError{
+			Inner: err,
+			Code:  customerr.CodeResourceOperateFailed,
+			Msg:   "获取文件信息失败",
+		}
+	}
 
 	newpath := filepath.Join(exp.GetCurrentDir(), fileaname)
 
-	return exp.GetFileInfo(newpath)
+	fileinfo, err := exp.GetFileInfo(newpath)
+	if err != nil {
+		return nil, &customerr.CustomError{
+			Inner: err,
+			Code:  customerr.CodeResourceOperateFailed,
+			Msg:   "获取文件信息失败",
+		}
+	}
 
+	return fileinfo, nil
 }
 
 // todo: 下载文件
@@ -108,7 +175,11 @@ func (service *resourceService) StreamUploadResource(path string, relative strin
 	err := exp.EnterDir(relative)
 
 	if err != nil {
-		return err
+		return &customerr.CustomError{
+			Inner: err,
+			Code:  customerr.CodeResourceUploadFailed,
+			Msg:   "上传文件失败",
+		}
 	}
 
 	newpath := filepath.Join(exp.GetCurrentDir(), fh.Filename)
@@ -116,8 +187,22 @@ func (service *resourceService) StreamUploadResource(path string, relative strin
 	src, err := fh.Open()
 
 	if err != nil {
-		return err
+		return &customerr.CustomError{
+			Inner: err,
+			Code:  customerr.CodeResourceUploadFailed,
+			Msg:   "上传文件失败",
+		}
 	}
 
-	return exp.StreamUpload(newpath, src)
+	err = exp.StreamUpload(newpath, src)
+
+	if err != nil {
+		return &customerr.CustomError{
+			Inner: err,
+			Code:  customerr.CodeResourceUploadFailed,
+			Msg:   "上传文件失败",
+		}
+	}
+
+	return nil
 }
