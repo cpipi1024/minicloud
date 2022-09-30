@@ -3,6 +3,8 @@ package service
 import (
 	"io"
 	"mime/multipart"
+	"net/http"
+	"os"
 	"path/filepath"
 
 	"cpipi1024.com/minicloud/pkg/customerr"
@@ -152,19 +154,35 @@ func (service *resourceService) ResourceDetail(path, relative, fileaname string)
 }
 
 // todo: 下载文件
-func (service *resourceService) StreamDownloadResource(path, relative, resourceName string) (io.Reader, error) {
+func (service *resourceService) StreamDownloadResource(w http.ResponseWriter, r *http.Request, path, relative, fileName string) error {
 
 	exp := explorer.NewDefaultExplorer(path)
 
 	err := exp.EnterDir(relative)
 
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	newpath := filepath.Join(exp.GetCurrentDir(), resourceName)
+	newpath := filepath.Join(exp.GetCurrentDir(), fileName)
 
-	return exp.StreamDownload(newpath)
+	// 打开文件
+	source, err := exp.StreamDownload(newpath)
+
+	if err != nil {
+		return err
+	}
+
+	file, _ := source.(*os.File)
+
+	info, _ := file.Stat()
+
+	// 接口变量
+	var content io.ReadSeeker = file
+
+	http.ServeContent(w, r, fileName, info.ModTime(), content)
+
+	return nil
 }
 
 // todo: 上传文件

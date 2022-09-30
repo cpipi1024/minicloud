@@ -194,12 +194,12 @@ func (exp *Explorer) SetExecutor(executor Executor) {
 
 // todo: 流上传
 func (exp *Explorer) StreamUpload(path string, source io.Reader) error {
-	return exp.GetExecutor().StreamUpload(path, source)
+	return exp.GetExecutor().CreateFile(path, source)
 }
 
 // todo: 流下载
 func (exp *Explorer) StreamDownload(path string) (io.Reader, error) {
-	return exp.GetExecutor().StreamDownload(path)
+	return exp.GetExecutor().OpenFile(path)
 }
 
 // todo: 获取文件信息
