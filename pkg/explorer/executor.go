@@ -26,11 +26,11 @@ type Executor interface {
 	// 获取buffersize
 	GetBuffer() int
 
-	// 流上传
-	StreamUpload(string, io.Reader) error
+	// 创建文件
+	CreateFile(string, io.Reader) error
 
-	// 流下载
-	StreamDownload(string) (io.Reader, error)
+	// 打开文件
+	OpenFile(string) (io.Reader, error)
 
 	// 复制
 	Copy(string, string) error
@@ -74,8 +74,8 @@ func (executor *NormalExecutor) GetBuffer() int {
 	return executor.buffersize
 }
 
-// todo: 流上传
-func (executor *NormalExecutor) StreamUpload(path string, source io.Reader) error {
+// todo: 创建文件
+func (executor *NormalExecutor) CreateFile(path string, source io.Reader) error {
 	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE, os.FileMode(executor.mode))
 
 	if err != nil {
@@ -96,11 +96,11 @@ func (executor *NormalExecutor) StreamUpload(path string, source io.Reader) erro
 	return nil
 }
 
-// todo: 流下载
+// todo: 打开文件
 // 将文件句柄返回给gin进行下载
 //
 // 因此文件的句柄需要手动进行关闭
-func (executor *NormalExecutor) StreamDownload(path string) (io.Reader, error) {
+func (executor *NormalExecutor) OpenFile(path string) (io.Reader, error) {
 	file, err := os.OpenFile(path, os.O_RDONLY, fs.FileMode(executor.mode))
 
 	if err != nil {

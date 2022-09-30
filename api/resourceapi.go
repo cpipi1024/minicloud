@@ -2,9 +2,7 @@ package api
 
 import (
 	"fmt"
-	"io"
 	"net/http"
-	"os"
 	"path/filepath"
 	"strconv"
 	"time"
@@ -204,9 +202,9 @@ func DownloaFile(c *gin.Context) {
 
 	baseDir := rawDir.(string)
 
-	relative := c.DefaultQuery("path", "")
+	path := c.DefaultQuery("path", "")
 
-	filename := c.DefaultQuery("name", "")
+	relative, filename := filepath.Split(path)
 
 	// 获取下载文件信息
 	info, err := service.ResourceService.ResourceDetail(baseDir, relative, filename)
@@ -233,7 +231,7 @@ func DownloaFile(c *gin.Context) {
 	ifRangeHeaderValue := c.GetHeader("If-Range") // 断点续传
 	rangeHeaderValue := c.GetHeader("Range")      // 文件范围
 
-	isHeaderRequest := c.Request.Method == "HEAD"
+	//isHeaderRequest := c.Request.Method == "HEAD"
 
 	// 文件起始位置和结束位置
 	var start, end int64
@@ -241,8 +239,7 @@ func DownloaFile(c *gin.Context) {
 
 	// 检验请求文件部分
 	if start < 0 || start >= fileSize || end < 0 || end >= fileSize {
-		Fail(c, 0, "文件下载失败")
-		c.Abort()
+		c.AbortWithStatus(http.StatusPreconditionFailed)
 		return
 	}
 
@@ -253,9 +250,8 @@ func DownloaFile(c *gin.Context) {
 		if ifRangeHeaderValue != "" && ifRangeHeaderValue != time.Unix(lastMidified, 0).UTC().Format(http.TimeFormat) {
 			// 如果if-range请求头存在，但是匹配不上文件修改时间，则直接返回完整文件
 			c.Status(http.StatusOK)
-			newpath := filepath.Join(baseDir, relative, fileName)
-			c.File(newpath)
-			return
+			//newpath := filepath.Join(baseDir, relative, fileName)
+			//return
 		} else {
 			// 匹配则返回指定部分数据
 			// 响应状态码 206
@@ -264,27 +260,41 @@ func DownloaFile(c *gin.Context) {
 		}
 	}
 
-	// 过滤head请求
-	if !isHeaderRequest {
-		path := filepath.Join(baseDir, relative, fileName)
+	err = service.ResourceService.StreamDownloadResource(c.Writer, c.Request, baseDir, relative, fileName)
 
-		file, err := os.Open(path)
-
-		if err != nil {
-			Fail(c, 0, "下载文件失败")
-			c.Abort()
-			return
+	if err != nil {
+		custErr := &customerr.CustomError{
+			Inner: err,
+			Code:  customerr.CodeResourceDownloadFailed,
+			Msg:   "文件下载失败",
 		}
-
-		// 找到分块文件开始下标
-		file.Seek(start, 0)
-
-		// 传输数据
-		_, err = io.CopyN(c.Writer, file, end-start+1)
-
-		if err != nil {
-			return
-		}
+		c.Error(custErr)
+		c.Abort()
+		return
 	}
 
+	/*
+		// 过滤head请求
+		   	if !isHeaderRequest {
+		   		path := filepath.Join(baseDir, relative, fileName)
+
+		   		file, err := os.Open(path)
+
+		   		if err != nil {
+		   			Fail(c, 0, "下载文件失败")
+		   			c.Abort()
+		   			return
+		   		}
+
+		   		// 找到分块文件开始下标
+		   		file.Seek(start, 0)
+
+		   		// 传输数据
+		   		_, err = io.CopyN(c.Writer, file, end-start+1)
+
+		   		if err != nil {
+		   			return
+		   		}
+		   	}
+	*/
 }
